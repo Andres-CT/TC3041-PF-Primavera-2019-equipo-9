@@ -4,8 +4,8 @@
 ---
 
 ##### Integrantes:
-1. *[Poner aquí Nombre y Apellidos del integrante 1]*
-2. *[Poner aquí Nombre y Apellidos del integrante 2]*
+1. Axel Zuchovicki Zaritsky
+2. Christian Aguilar Piña
 
 
 ---
