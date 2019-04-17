@@ -48,19 +48,39 @@ class Person(Resource):
     def post(self):
         parser = reqparse.RequestParser()
 
+        parser.add_argument('id', required=True)
         parser.add_argument('name', required=True)
         parser.add_argument('age', required=True)
-        parser.add_argument('family', required=True)
-        parser.add_argument('work_place', required=True)
-        parser.add_argument('home_area', required=True)
 
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        node = Node("Person", name=args['name'], age=args['age'], family=args['family'], work_place=args['work_place'], home_area=args['home_area'])
+        node = Node("Person", id=args['id'], name=args['name'], age=args['age'])
         graph.create(node)
 
         return {'message': 'Person registered', 'data': args}, 201
+
+
+class BidirectionalRelation(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('relation', required=True)
+        parser.add_argument('first_id', required=True)
+        parser.add_argument('second_id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        first_node = graph.find_one("Person", "id", args['first_id'])
+        second_node = graph.find_one("Person", "id", args['second_id'])
+
+        relation_1 = Relationship(first_node, args['relation'], second_node)
+        relation_2 = Relationship(second_node, args['relation'], first_node)
+        graph.create(relation_1)
+        graph.create(relation_2)
+
+        return {'message': 'Relationship registered', 'data': args}, 201
 
 
 class DeviceList(Resource):
@@ -105,3 +125,4 @@ class Device(Resource):
 api.add_resource(DeviceList, '/devices')
 api.add_resource(Device, '/device/<string:identifier>')
 api.add_resource(Person, '/person')
+api.add_resource(BidirectionalRelation, '/relation')
