@@ -33,7 +33,7 @@ while(1):
   #Payload is the json to be sent to the url
   payload = {'id': id_person, 'name':name, 'age':random_age}
   #url is the url used for the requests
-  url = '172.17.0.1:80'
+  url = 'http://192.168.1.65:80/person'
   r = requests.post(url,json=payload)
 
   #Debugging
