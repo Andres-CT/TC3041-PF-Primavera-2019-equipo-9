@@ -71,5 +71,27 @@ class BidirectionalRelation(Resource):
         return {'message': 'Relationship registered', 'data': args}, 201
 
 
+class Disease(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+        parser.add_argument('name', required=True)
+        parser.add_argument('spread_type', required=True)
+        parser.add_argument('infected_id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        node = Node("Disease", id=args['id'], name=args['name'], spread_type=args['spread_type'])
+        infected = graph.find_one("Person", "id", args['infected_id'])
+        relation = Relationship(node, "infects", infected)
+        graph.create(node)
+        graph.create(relation)
+
+        return {'message': 'Disease registered', 'data': args}, 201
+
+
 api.add_resource(Person, '/person')
 api.add_resource(BidirectionalRelation, '/relation')
+api.add_resource(Disease, '/disease')
