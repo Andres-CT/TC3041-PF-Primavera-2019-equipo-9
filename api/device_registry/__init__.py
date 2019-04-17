@@ -1,10 +1,16 @@
 import markdown
 import os
+import uuid
 import shelve
 
 # Import the framework
-from flask import Flask, g
+from flask import Flask, g, request, url_for, jsonify
 from flask_restful import Resource, Api, reqparse
+from flask_api import FlaskAPI, status, exceptions
+from py2neo import Graph, Node, Relationship
+
+
+graph = Graph("http://neo4j:7474/db/data/")
 
 # Create an instance of Flask
 app = Flask(__name__)
@@ -37,7 +43,8 @@ def index():
         # Convert to HTML
         return markdown.markdown(content)
 
-Class Person(Resource):
+
+class Person(Resource):
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -50,10 +57,11 @@ Class Person(Resource):
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        shelf = get_db()
-        shelf[args['identifier']] = args
+        node = Node("Person", name=args['name'], age=args['age'], family=args['family'], work_place=args['work_place'], home_area=args['home_area'])
+        graph.create(node)
 
-        return {'message': 'Device registered', 'data': args}, 201
+        return {'message': 'Person registered', 'data': args}, 201
+
 
 class DeviceList(Resource):
     def post(self):
@@ -96,3 +104,4 @@ class Device(Resource):
 
 api.add_resource(DeviceList, '/devices')
 api.add_resource(Device, '/device/<string:identifier>')
+api.add_resource(Person, '/person')

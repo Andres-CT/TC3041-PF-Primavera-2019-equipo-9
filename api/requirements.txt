@@ -1,3 +1,7 @@
-Flask==0.12.2
 flask-restful==0.3.6
 markdown==2.6.11
+flask==1.0.2
+flask-api==1.0
+py2neo==2.0
+gunicorn==19.9.0
+python-dotenv
