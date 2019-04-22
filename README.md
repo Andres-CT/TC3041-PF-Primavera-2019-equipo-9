@@ -33,7 +33,7 @@ El proyecto debe seguir la siguiente estructura de carpetas:
     - api			# Carpeta con la solución de la API
     - datasets		        # Carpeta con los datasets y recursos utilizados (csv, json, audio, videos, entre otros)
     - dbs			# Carpeta con los modelos, catálogos y scripts necesarios para generar las bases de datos
-    - models			# Carpeta donde se almacenarán los modelos de Machine Learning ya entrenados 
+    - models			# Carpeta donde se almacenarán los modelos de Machine Learning ya entrenados
     - docs			# Carpeta con la documentación del proyecto
         - stage_f               # Documentos de la entrega final
         - manuals               # Manuales y guías
@@ -46,7 +46,7 @@ Como parte de la entrega final del proyecto, se debe incluir la siguiente inform
 * Justificación de los modelo de *bases de datos* que seleccionaron.
 * Descripción del o los *datasets* y las fuentes de información utilizadas.
 * Guía de configuración, instalación y despliegue de la solución en la plataforma en la nube  seleccionada.
-* Documentación de la API. Puede ver un ejemplo en [Swagger](https://swagger.io/). 
+* Documentación de la API. Puede ver un ejemplo en [Swagger](https://swagger.io/).
 * El código debe estar documentado siguiendo los estándares definidos para el lenguaje de programación seleccionado.
 
 ## 2. Descripción del proyecto
@@ -97,11 +97,18 @@ A continuación aparecen descritos los diferentes elementos que forman parte de 
 * **URL**:
 * **Verbos HTTP**:
 * **Headers**:
-* **Formato JSON del cuerpo de la solicitud**: 
+* **Formato JSON del cuerpo de la solicitud**:
 * **Formato JSON de la respuesta**:
 
 
 ## 3.6 Pasos a seguir para utilizar el proyecto
+
+      1. Ejecutar el contenedor donde se encuentra neo4j:
+        * sudo docker run --publish=7474:7474 --name=neo4j --publish=7687:7687 --volume=$HOME/neo4j/data:/data --env=NEO4J_AUTH=none --network=neo4j-net neo4j
+      2. Ejecutar el contenedor donde se encuentra el Api
+        * sudo docker build -t device-api .
+        * sudo docker run --network=neo4j-net -p 80:80 device-api
+
 
 *[Incluya aquí una guía paso a paso para poder utilizar el proyecto, desde la clonación del repositorio hasta el despliegue de la solución en una plataforma en la nube.]*
 
