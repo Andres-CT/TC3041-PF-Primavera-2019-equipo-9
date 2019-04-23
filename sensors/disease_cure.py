@@ -10,8 +10,9 @@ while(1):
     get_disease_request = requests.get(url_get)
     request_json = get_disease_request.json()
     request_string = str(request_json)
-    request_string_idx = request_string.find("'id'")
-    disease_count = request_string[request_string_idx + 8]
+    request_string_idx = request_string.find("count")
+    request_string_idx_end = request_string.find("}",int(request_string_idx))
+    disease_count = request_string[request_string_idx + 8:request_string_idx_end]
 
     id = random.randint(0, int(disease_count))
     payload = {'id':id}
