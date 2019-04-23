@@ -20,7 +20,7 @@ while(1):
     infected = random.randint(0,int(people_count))
 
 
-    payload = {'id':disease_id, 'name':disease_name,'spread_type':spread,'infected_id':infected}
+    payload = {'name':disease_name,'spread_type':spread,'infected_id':infected}
     url = 'http://192.168.1.65:80/disease'
     r = requests.post(url,json=payload)
 
