@@ -8,6 +8,7 @@ from flask import Flask, g, request, url_for, jsonify
 from flask_restful import Resource, Api, reqparse
 from flask_api import FlaskAPI, status, exceptions
 from py2neo import Graph, Node, Relationship
+from json import dumps
 
 
 graph = Graph("http://neo4j:7474/db/data/")
@@ -33,6 +34,14 @@ def index():
 
 
 class Person(Resource):
+    def get(self):
+        cypher = graph.cypher
+        query = "MATCH (:Person) RETURN count(*)"
+        result = cypher.execute(query)
+
+        return {'message': 'Success', 'count': result[0][0]}, 200
+
+
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -72,6 +81,14 @@ class BidirectionalRelation(Resource):
 
 
 class Disease(Resource):
+    def get(self):
+        cypher = graph.cypher
+        query = "MATCH (:Disease) RETURN count(*)"
+        result = cypher.execute(query)
+
+        return {'message': 'Success', 'count': result[0][0]}, 200
+
+
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -132,7 +149,7 @@ class DiseaseCure(Resource):
         query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
         cypher.execute(query)
 
-        return {'message': 'Disease searched', 'data': args}, 201
+        return {'message': 'Disease cured', 'data': args}, 201
 
 
 api.add_resource(Person, '/person')
