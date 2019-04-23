@@ -85,13 +85,41 @@ class Disease(Resource):
 
         node = Node("Disease", id=args['id'], name=args['name'], spread_type=args['spread_type'])
         infected = graph.find_one("Person", "id", args['infected_id'])
-        relation = Relationship(node, "infects", infected)
+        relation = Relationship(node, "INFECTS", infected)
         graph.create(node)
         graph.create(relation)
 
         return {'message': 'Disease registered', 'data': args}, 201
 
 
+class DiseaseSpread(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        disease_node = graph.find_one("Disease", "id", args['id'])
+        spread_type = disease_node.properties["spread_type"]
+        rel_affected = ""
+
+        if spread_type == "fluids":
+            rel_affected = ":FAMILY"
+        if spread_type == "touch":
+            rel_affected = ":WORK|FAMILY"
+        if spread_type == "air":
+            rel_affected = ":NEIGHBOR|WORK|FAMILY"
+
+        cypher = graph.cypher
+        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[:INFECTS]->(a)"
+        cypher.execute(query)
+
+        return {'message': 'Disease searched', 'data': rel_affected}, 201
+
+
 api.add_resource(Person, '/person')
 api.add_resource(BidirectionalRelation, '/relation')
 api.add_resource(Disease, '/disease')
+api.add_resource(DiseaseSpread, '/spread')
