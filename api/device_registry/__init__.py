@@ -10,6 +10,8 @@ from flask_api import FlaskAPI, status, exceptions
 from py2neo import Graph, Node, Relationship
 from json import dumps
 
+from .functions import get_people_count, get_disease_count
+
 
 graph = Graph("http://neo4j:7474/db/data/")
 
@@ -35,24 +37,21 @@ def index():
 
 class Person(Resource):
     def get(self):
-        cypher = graph.cypher
-        query = "MATCH (:Person) RETURN count(*)"
-        result = cypher.execute(query)
+        count = get_people_count(graph)
 
-        return {'message': 'Success', 'count': result[0][0]}, 200
-
+        return {'message': 'Success', 'count': count}, 200
 
     def post(self):
         parser = reqparse.RequestParser()
 
-        parser.add_argument('id', required=True)
         parser.add_argument('name', required=True)
         parser.add_argument('age', required=True)
 
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        node = Node("Person", id=args['id'], name=args['name'], age=args['age'])
+        id = get_people_count(graph)
+        node = Node("Person", id=id, name=args['name'], age=args['age'])
         graph.create(node)
 
         return {'message': 'Person registered', 'data': args}, 201
@@ -69,8 +68,8 @@ class BidirectionalRelation(Resource):
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        first_node = graph.find_one("Person", "id", args['first_id'])
-        second_node = graph.find_one("Person", "id", args['second_id'])
+        first_node = graph.find_one("Person", "id", int(args['first_id']))
+        second_node = graph.find_one("Person", "id", int(args['second_id']))
 
         relation_1 = Relationship(first_node, args['relation'], second_node)
         relation_2 = Relationship(second_node, args['relation'], first_node)
@@ -82,17 +81,14 @@ class BidirectionalRelation(Resource):
 
 class Disease(Resource):
     def get(self):
-        cypher = graph.cypher
-        query = "MATCH (:Disease) RETURN count(*)"
-        result = cypher.execute(query)
+        count = get_disease_count(graph)
 
-        return {'message': 'Success', 'count': result[0][0]}, 200
+        return {'message': 'Success', 'count': count}, 200
 
 
     def post(self):
         parser = reqparse.RequestParser()
 
-        parser.add_argument('id', required=True)
         parser.add_argument('name', required=True)
         parser.add_argument('spread_type', required=True)
         parser.add_argument('infected_id', required=True)
@@ -100,8 +96,9 @@ class Disease(Resource):
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        node = Node("Disease", id=args['id'], name=args['name'], spread_type=args['spread_type'])
-        infected = graph.find_one("Person", "id", args['infected_id'])
+        id = get_disease_count(graph)
+        node = Node("Disease", id=id, name=args['name'], spread_type=args['spread_type'])
+        infected = graph.find_one("Person", "id", int(args['infected_id']))
         relation = Relationship(node, "INFECTS", infected)
         graph.create(node)
         graph.create(relation)
@@ -118,7 +115,7 @@ class DiseaseSpread(Resource):
         # Parse the arguments into an object
         args = parser.parse_args()
 
-        disease_node = graph.find_one("Disease", "id", args['id'])
+        disease_node = graph.find_one("Disease", "id", int(args['id']))
         spread_type = disease_node.properties["spread_type"]
         rel_affected = ""
 
@@ -130,7 +127,7 @@ class DiseaseSpread(Resource):
             rel_affected = ":NEIGHBOR|WORK|FAMILY"
 
         cypher = graph.cypher
-        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[:INFECTS]->(a)"
+        query = "MATCH (d:Disease {id:" + args['id'] + "})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[:INFECTS]->(a)"
         cypher.execute(query)
 
         return {'message': 'Disease searched', 'data': rel_affected}, 201
@@ -146,7 +143,7 @@ class DiseaseCure(Resource):
         args = parser.parse_args()
 
         cypher = graph.cypher
-        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
+        query = "MATCH (d:Disease {id:" + args['id'] + "})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
         cypher.execute(query)
 
         return {'message': 'Disease cured', 'data': args}, 201
