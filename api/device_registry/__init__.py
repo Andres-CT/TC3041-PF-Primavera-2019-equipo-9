@@ -119,7 +119,24 @@ class DiseaseSpread(Resource):
         return {'message': 'Disease searched', 'data': rel_affected}, 201
 
 
+class DiseaseCure(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        cypher = graph.cypher
+        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
+        cypher.execute(query)
+
+        return {'message': 'Disease searched', 'data': args}, 201
+
+
 api.add_resource(Person, '/person')
 api.add_resource(BidirectionalRelation, '/relation')
 api.add_resource(Disease, '/disease')
 api.add_resource(DiseaseSpread, '/spread')
+api.add_resource(DiseaseCure, '/cure')
