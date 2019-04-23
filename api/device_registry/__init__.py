@@ -8,6 +8,7 @@ from flask import Flask, g, request, url_for, jsonify
 from flask_restful import Resource, Api, reqparse
 from flask_api import FlaskAPI, status, exceptions
 from py2neo import Graph, Node, Relationship
+from json import dumps
 
 
 graph = Graph("http://neo4j:7474/db/data/")
@@ -33,6 +34,14 @@ def index():
 
 
 class Person(Resource):
+    def get(self):
+        cypher = graph.cypher
+        query = "MATCH (:Person) RETURN count(*)"
+        result = cypher.execute(query)
+
+        return {'message': 'Success', 'count': result[0][0]}, 200
+
+
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -72,6 +81,14 @@ class BidirectionalRelation(Resource):
 
 
 class Disease(Resource):
+    def get(self):
+        cypher = graph.cypher
+        query = "MATCH (:Disease) RETURN count(*)"
+        result = cypher.execute(query)
+
+        return {'message': 'Success', 'count': result[0][0]}, 200
+
+
     def post(self):
         parser = reqparse.RequestParser()
 
@@ -85,13 +102,58 @@ class Disease(Resource):
 
         node = Node("Disease", id=args['id'], name=args['name'], spread_type=args['spread_type'])
         infected = graph.find_one("Person", "id", args['infected_id'])
-        relation = Relationship(node, "infects", infected)
+        relation = Relationship(node, "INFECTS", infected)
         graph.create(node)
         graph.create(relation)
 
         return {'message': 'Disease registered', 'data': args}, 201
 
 
+class DiseaseSpread(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        disease_node = graph.find_one("Disease", "id", args['id'])
+        spread_type = disease_node.properties["spread_type"]
+        rel_affected = ""
+
+        if spread_type == "fluids":
+            rel_affected = ":FAMILY"
+        if spread_type == "touch":
+            rel_affected = ":WORK|FAMILY"
+        if spread_type == "air":
+            rel_affected = ":NEIGHBOR|WORK|FAMILY"
+
+        cypher = graph.cypher
+        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[:INFECTS]->(a)"
+        cypher.execute(query)
+
+        return {'message': 'Disease searched', 'data': rel_affected}, 201
+
+
+class DiseaseCure(Resource):
+    def post(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        cypher = graph.cypher
+        query = "MATCH (d:Disease {id:\"" + args['id'] + "\"})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
+        cypher.execute(query)
+
+        return {'message': 'Disease cured', 'data': args}, 201
+
+
 api.add_resource(Person, '/person')
 api.add_resource(BidirectionalRelation, '/relation')
 api.add_resource(Disease, '/disease')
+api.add_resource(DiseaseSpread, '/spread')
+api.add_resource(DiseaseCure, '/cure')
