@@ -3,8 +3,9 @@ import requests
 import os
 import time
 
-id_person = -1
+#id_person = -1
 while(1):
+  #ID NO LONGER NEEDED
   #Generate id for the person and increment the counter
 
   #ID method with a text file. IT IS INCOMPLETE
@@ -17,7 +18,7 @@ while(1):
   # file.close()
 
   #Easy method for id
-  id_person += 1
+  #id_person += 1
 
   #Generate a random number and obtain the corresponding name in the names file
   random_index_name = random.randint(1,100)
@@ -31,13 +32,13 @@ while(1):
 
   #Sent Post request
   #Payload is the json to be sent to the url
-  payload = {'id': id_person, 'name':name, 'age':random_age}
+  payload = {'name':name, 'age':random_age}
   #url is the url used for the requests
   url = 'http://192.168.1.65:80/person'
   r = requests.post(url,json=payload)
 
   #Debugging
-  print (id_person)
+  #print (id_person)
   print (name)
   print (random_age)
   print(r.text)
