@@ -10,7 +10,7 @@ from flask_api import FlaskAPI, status, exceptions
 from py2neo import Graph, Node, Relationship
 from json import dumps
 
-from .functions import get_people_count, get_disease_count
+from .functions import get_people_count, get_disease_count, get_infected_count
 
 
 graph = Graph("http://neo4j:7474/db/data/")
@@ -97,7 +97,7 @@ class Disease(Resource):
         args = parser.parse_args()
 
         id = get_disease_count(graph)
-        node = Node("Disease", id=id, name=args['name'], spread_type=args['spread_type'])
+        node = Node("Disease", id=id, name=args['name'], spread_type=args['spread_type'], current_infected=1)
         infected = graph.find_one("Person", "id", int(args['infected_id']))
         relation = Relationship(node, "INFECTS", infected)
         graph.create(node)
@@ -127,10 +127,13 @@ class DiseaseSpread(Resource):
             rel_affected = ":NEIGHBOR|WORK|FAMILY"
 
         cypher = graph.cypher
-        query = "MATCH (d:Disease {id:" + args['id'] + "})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[:INFECTS]->(a)"
+        query = "MATCH (d:Disease {id:" + args['id'] + "})-[:INFECTS]-(p:Person), (p)-[" + rel_affected + "]->(a) MERGE (d)-[s:INFECTS]->(a)"
         cypher.execute(query)
+        current_infected = get_infected_count(graph, args['id'])
+        disease_node.properties["current_infected"] = current_infected
+        disease_node.push()
 
-        return {'message': 'Disease searched', 'data': rel_affected}, 201
+        return {'message': 'Disease spreaded', 'data': rel_affected}, 201
 
 
 class DiseaseCure(Resource):
@@ -146,8 +149,11 @@ class DiseaseCure(Resource):
         query = "MATCH (d:Disease {id:" + args['id'] + "})-[r:INFECTS]-(p:Person) WITH d,r,p limit 1 DELETE r MERGE (d)-[:CURED]->(p)"
         cypher.execute(query)
 
-        return {'message': 'Disease cured', 'data': args}, 201
+        disease_node = graph.find_one("Disease", "id", int(args['id']))
+        disease_node.properties["current_infected"] = disease_node.properties["current_infected"] - 1
+        disease_node.push()
 
+        return {'message': 'Disease cured', 'data': args}, 201
 
 api.add_resource(Person, '/person')
 api.add_resource(BidirectionalRelation, '/relation')
