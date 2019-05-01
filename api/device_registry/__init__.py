@@ -104,7 +104,7 @@ class Disease(Resource):
         graph.create(node)
         graph.create(relation)
 
-        return {'message': 'Disease registered', 'data': args}, 201
+        return {'message': 'Disease registered', 'data': args, 'id': id}, 201
 
 
 class DiseaseSpread(Resource):
@@ -138,6 +138,18 @@ class DiseaseSpread(Resource):
 
 
 class DiseaseCure(Resource):
+    def get(self):
+        parser = reqparse.RequestParser()
+
+        parser.add_argument('id', required=True)
+
+        # Parse the arguments into an object
+        args = parser.parse_args()
+
+        count = get_infected_count(graph, args['id'])
+        return {'message': 'Success', 'count': count}, 200
+
+
     def post(self):
         parser = reqparse.RequestParser()
 
