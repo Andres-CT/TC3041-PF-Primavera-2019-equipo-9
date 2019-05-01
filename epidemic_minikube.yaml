@@ -172,7 +172,7 @@ spec:
     spec:
       containers:
         - name: neo4j 
-          image: neo4j:3.4
+          image: neo4j-file
           env:
           - name: NEO4J_AUTH 
             value: "none" 
