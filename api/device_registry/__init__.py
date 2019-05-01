@@ -13,7 +13,8 @@ from json import dumps
 from .functions import get_people_count, get_disease_count, get_infected_count
 
 
-graph = Graph("http://neo4j:7474/db/data/")
+# graph = Graph("http://neo4j:7474/db/data/")
+graph = Graph(os.environ['NEO4J_URL'])
 
 # Create an instance of Flask
 app = Flask(__name__)

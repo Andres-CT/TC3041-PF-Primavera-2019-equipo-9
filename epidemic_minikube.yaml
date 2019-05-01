@@ -1,0 +1,249 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: neo4j-pv-claim
+  labels:
+    app: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: elasticsearch-pv-claim
+  labels:
+    app: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: kibana-pv-claim
+  labels:
+    app: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch 
+  labels:
+    app: elasticsearch 
+spec:
+  ports:
+    - port: 9200 
+      targetPort: 9200 
+    - port: 9300 
+      targetPort: 9300 
+  selector:
+    app: elasticsearch
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j 
+  labels:
+    app: neo4j 
+spec:
+  ports:
+    - port: 7474 
+      targetPort: 7474 
+    - port: 7687 
+      targetPort: 7687 
+  selector:
+    app: neo4j 
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana 
+  labels:
+    app: kibana 
+spec:
+  ports:
+    - port: 5601 
+      targetPort: 5601 
+  selector:
+    app: kibana 
+  type: NodePort
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api 
+  labels:
+    app: api 
+spec:
+  ports:
+    - port: 80 
+      targetPort: 80 
+  selector:
+    app: api 
+  type: NodePort
+
+---
+
+apiVersion: apps/v1
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch 
+  labels:
+    app: elasticsearch 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch 
+  template:
+    metadata:
+      labels:
+        app: elasticsearch 
+    spec:
+      containers:
+        - name: elasticsearch 
+          image: elasticsearch:7.0.0
+          env:
+          - name: discovery.type 
+            value: "single_node" 
+          ports:
+            - containerPort: 9200 
+              protocol: TCP
+            - containerPort: 9300 
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/elasticsearch
+              name: elasticsearch-ps
+      volumes:
+        - name: elasticsearch-ps
+          persistentVolumeClaim:
+            claimName: elasticsearch-pv-claim
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: neo4j 
+  labels:
+    app: neo4j 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: neo4j 
+  template:
+    metadata:
+      labels:
+        app: neo4j 
+    spec:
+      containers:
+        - name: neo4j 
+          image: neo4j:3.4
+          env:
+          - name: NEO4J_AUTH 
+            value: "none" 
+          ports:
+          - containerPort: 7474 
+            protocol: TCP
+          - containerPort: 7687 
+            protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/neo4j
+              name: neo4j-ps
+      volumes:
+        - name: neo4j-ps
+          persistentVolumeClaim:
+            claimName: neo4j-pv-claim
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana 
+  labels:
+    app: kibana 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kibana 
+  template:
+    metadata:
+      labels:
+        app: kibana 
+    spec:
+      containers:
+        - name: kibana 
+          image: docker.elastic.co/kibana/kibana:7.0.0
+          env:
+          - name: ELASTICSEARCH_URL
+            value: "http://elastic:9200" 
+          ports:
+          - containerPort: 5601 
+            protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/kibana
+              name: kibana-ps
+      volumes:
+        - name: kibana-ps
+          persistentVolumeClaim:
+            claimName: kibana-pv-claim
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api 
+  labels:
+    app: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api 
+  template:
+    metadata:
+      labels:
+        app: api 
+    spec:
+      containers:
+        - name: api 
+          image: device-api 
+          env:
+          - name: NEO4J_URL 
+            value: "http://neo4j:7474/db/data/" 
+          ports:
+          - containerPort: 80 
+            protocol: TCP
