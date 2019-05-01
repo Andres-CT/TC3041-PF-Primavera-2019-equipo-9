@@ -51,9 +51,11 @@ metadata:
     app: elasticsearch 
 spec:
   ports:
-    - port: 9200 
-      targetPort: 9200 
-    - port: 9300 
+    - name: port1
+      port: 9200
+      targetPort: 9200
+    - name: port2
+      port: 9300 
       targetPort: 9300 
   selector:
     app: elasticsearch
@@ -69,9 +71,11 @@ metadata:
     app: neo4j 
 spec:
   ports:
-    - port: 7474 
+    - name: port1
+      port: 7474 
       targetPort: 7474 
-    - port: 7687 
+    - name: port2
+      port: 7687 
       targetPort: 7687 
   selector:
     app: neo4j 
