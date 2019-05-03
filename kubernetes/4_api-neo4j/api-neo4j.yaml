@@ -1,0 +1,97 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: neo4j-pv-claim
+  labels:
+    app: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: neo4j 
+  labels:
+    app: neo4j 
+spec:
+  ports:
+    - name: port1
+      port: 7474 
+      targetPort: 7474
+    - name: port2
+      port: 7687 
+      targetPort: 7687 
+  selector:
+    app: neo4j 
+  type: LoadBalancer
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api 
+  labels:
+    app: api 
+spec:
+  ports:
+    - port: 80 
+      targetPort: 80 
+  selector:
+    app: api 
+  type: LoadBalancer
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api 
+  labels:
+    app: api 
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api 
+  template:
+    metadata:
+      labels:
+        app: api 
+    spec:
+      terminationGracePeriodSeconds: 300
+      containers:
+        - name: api 
+          image: gcr.io/test-vcn-ep/api:latest
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: NEO4J_URL 
+            value: "http://localhost:7474/db/data/" 
+          ports:
+          - containerPort: 80 
+            protocol: TCP
+        - name: neo4j 
+          image: gcr.io/test-vcn-ep/neo4j
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: NEO4J_AUTH 
+            value: "none" 
+          ports:
+          - containerPort: 7474 
+            protocol: TCP
+          - containerPort: 7687 
+            protocol: TCP
+          volumeMounts:
+             - mountPath: /var/lib/neo4j/data
+               name: neo4j-ps
+      volumes:
+        - name: neo4j-ps
+          persistentVolumeClaim:
+            claimName: neo4j-pv-claim
+
