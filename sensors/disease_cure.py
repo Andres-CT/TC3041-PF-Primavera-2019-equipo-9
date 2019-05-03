@@ -16,5 +16,5 @@ while(1):
 
     id = random.randint(0, int(disease_count))
     payload = {'id':id}
-    url = 'http://192.168.1.65:80/spread'
+    url = 'http://192.168.1.65:80/cure'
     r = requests.post()
