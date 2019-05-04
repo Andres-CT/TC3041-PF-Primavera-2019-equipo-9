@@ -8,7 +8,7 @@ spread_list = ['Fluids', 'Touch', 'Air']
 while(1):
     disease_name = ''.join([random.choice(string.ascii_lowercase) for n in xrange(5)])
     spread = spread_list[random.randint(0,2)]
-    url_get = 'http://192.168.1.65:80/person'
+    url_get = 'http://130.211.234.22:80/person'
     #url_get = 'https://reqres.in/api/users/2'
 
     get_people_request = requests.get(url_get)
@@ -21,7 +21,7 @@ while(1):
 
 
     payload = {'name':disease_name,'spread_type':spread,'infected_id':infected}
-    url = 'http://192.168.1.65:80/disease'
+    url = 'http://130.211.234.22:80/disease'
     r = requests.post(url,json=payload)
 
     #Debugging
@@ -31,4 +31,5 @@ while(1):
     print(infected)
     print(r.text)
 
-    time.sleep(2)
+    #time.sleep(2)
+    break;

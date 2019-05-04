@@ -51,7 +51,22 @@ Como parte de la entrega final del proyecto, se debe incluir la siguiente inform
 
 ## 2. Descripción del proyecto
 
-*[Incluya aquí la descripción del proyecto seleccionado.]*
+Este proyecto consiste en un simulador de enfermedades. Cada enfermedad está definida por:
+  * Medio de transmisión
+  * Tasa de curación
+  * Tasa de infección
+
+Utilizamos una 'población' de 10,000 personas y 30,000 relaciones entre sí. También, creamos diferentes programas que simulan ser sensores. Estos sensores son capaces de:
+  * Crear nuevas personas
+  * Crear nuevas relaciones
+  * Crear nuevas infecciones
+  * Propagar infecciones
+  * Curar cierta infección en una persona afectada
+
+Además, un programa nos permite simular una infección; permitiendo ver a tiempo real su comportamiento en nuestra aplicación.
+
+Con este proyecto, utilizamos varias herramientas para crear un framework original y útil que permite el análisis del comportamiento de diferentes enfermedades.
+
 
 ## 3. Solución
 
@@ -59,7 +74,7 @@ A continuación aparecen descritos los diferentes elementos que forman parte de 
 
 ### 3.1 Modelos de *bases de datos* utilizados
 
-*[Incluya aquí una explicación del análisis realizado y la justificación de los modelos de *bases de datos* seleccionados. Incluya todo lo que considere necesario para que una persona sin conocimientos técnicos pueda entender de que trata su solución.]*
+
 
 ### 3.2 Arquitectura de la solución
 

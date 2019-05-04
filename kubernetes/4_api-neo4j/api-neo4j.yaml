@@ -68,7 +68,7 @@ spec:
       terminationGracePeriodSeconds: 300
       containers:
         - name: api 
-          image: gcr.io/test-vcn-ep/api:latest
+          image: gcr.io/disease-data-science/api:latest
           imagePullPolicy: IfNotPresent
           env:
           - name: NEO4J_URL 
@@ -77,7 +77,7 @@ spec:
           - containerPort: 80 
             protocol: TCP
         - name: neo4j 
-          image: gcr.io/test-vcn-ep/neo4j
+          image: gcr.io/disease-data-science/neo4j
           imagePullPolicy: IfNotPresent
           env:
           - name: NEO4J_AUTH 

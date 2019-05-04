@@ -4,7 +4,7 @@ import os
 import time
 
 #id_person = -1
-for it in range(10000):
+for it in range(10):
   #ID NO LONGER NEEDED
   #Generate id for the person and increment the counter
 
@@ -34,7 +34,7 @@ for it in range(10000):
   #Payload is the json to be sent to the url
   payload = {'name':name, 'age':random_age}
   #url is the url used for the requests
-  url = 'http://192.168.1.103:80/person'
+  url = 'http://130.211.234.22:80/person'
   r = requests.post(url,json=payload)
 
   #Debugging

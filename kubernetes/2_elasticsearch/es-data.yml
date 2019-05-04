@@ -121,7 +121,7 @@ spec:
         storageClassName: ssd
         resources:
           requests:
-            storage: 250Gi
+            storage: 25Gi
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
