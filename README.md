@@ -1,6 +1,6 @@
 # TC3041 Proyecto  Final Primavera 2019
 
-#*[Poner aquí el Título del Proyecto]*
+# *Disease Data Science*
 ---
 
 ##### Integrantes:
@@ -63,7 +63,7 @@ Utilizamos una 'población' de 10,000 personas y 30,000 relaciones entre sí. Ta
   * Propagar infecciones
   * Curar cierta infección en una persona afectada
 
-Además, un programa nos permite simular una infección; permitiendo ver a tiempo real su comportamiento en nuestra aplicación.
+Además, un programa nos permite simular una infección; permitiendo ver a tiempo real su comportamiento en nuestro frontend en Kibana.
 
 Con este proyecto, utilizamos varias herramientas para crear un framework original y útil que permite el análisis del comportamiento de diferentes enfermedades.
 
@@ -74,59 +74,176 @@ A continuación aparecen descritos los diferentes elementos que forman parte de 
 
 ### 3.1 Modelos de *bases de datos* utilizados
 
+Nuestro objetivo, al modelar este problema, era poder realizar un analisis de
+diferentes enfermedades sobre una poblacion determinada. Entonces necesitamos, primero crear una poblacion.
 
+Las personas estan descritas por:
+1. ID: Inicia en 0, incremental.
+2. Nombre: Nombre aleatorio.
+3. Edad: Entre 0 y 100 años.
+
+Despues, para poder simular la propagacion de la enfermedad, era necesario formar relaciones entre las personas en nuestra poblacion. Las relaciones podian ser de tres tipos:
+1. Familia
+2. Vecino
+3. Compañero de Trabajo
+
+Una vez que tenemos la poblacion descrita de esta manera, se pueden definir enfermedades:
+1. Nombre
+2. Tipo de propagacion:
+  * Aire
+  * Fluidos
+  * Tacto
+3. Numero de infectados
 
 ### 3.2 Arquitectura de la solución
 
-*[Incluya aquí un diagrama donde se aprecie la arquitectura de la solución propuesta, así como la interacción entre los diferentes componentes de la misma.]*
+![alt-text](README_images/Disease_Architecture.png)
 
 ### 3.3 Frontend
 
-*[Incluya aquí una explicación de la solución utilizada para el frontend del proyecto. No olvide incluir las ligas o referencias donde se puede encontrar información de los lenguajes de programación, frameworks y librerías utilizadas.]*
+Para el frontend utilizamos [Kibana](https://www.elastic.co/products/kibana). Esta herramienta nos permite visualizar de manera interactiva el comportamiento de nuestras enfermedades. De igual manera, al estar sobre elasticsearch, permite visualizar cambios en propagacion a tiempo real.
 
-#### 3.3.1 Lenguaje de programación
-#### 3.3.2 Framework
-#### 3.3.3 Librerías de funciones o dependencias
+De esta manera, fue simple crear nuestras diferentes visualizaciones dentro de la herramienta.
 
 ### 3.4 Backend
 
-*[Incluya aquí una explicación de la solución utilizada para el backend del proyecto. No olvide incluir las ligas o referencias donde se puede encontrar información de los lenguajes de programación, frameworks y librerías utilizadas.]*
+El Backend del proyecto fue dividido en dos diferentes Bases de Datos:
+1. Neo4j
+2. Elasticsearch
+
+#### Neo4j
+Neo4j nos permite guardar las relaciones entre personas de manera eficiente. Ademas, nos ayudo a simular la propagacion de las enfermedades, ya que podemos encontrar cuales son las personas que estan infectadas con cierta enfermedad y buscar las conexiones entre ellas en tiempo constante.
+
+#### Elasticsearch
+Elasticsearch nos permite, en conjunto con Kibana, visualizar los datos sobre las diferentes enfermedades. Esta BD se alimenta de datos insertados en Neo4j. Despues de recuperar estos datos, los indexa de cierta manera para que Kibana pueda visualizarlos correctamente.
 
 #### 3.4.1 Lenguaje de programación
+Neo4j configuration para la comunicacion entre Neo4j y elasticsearch.
 #### 3.4.2 Framework
+1. Neo4j
+2. Elasticsearch
+
 #### 3.4.3 Librerías de funciones o dependencias
+Para la comunicacion entre Neo4j y elasticsearch se utilizo [este plugin](https://github.com/neo4j-contrib/neo4j-elasticsearch). Con este plugin, los datos insertados en Neo4j son copiados a tiempo real en nuestra BD de elasticsearch.
 
 ### 3.5 API
 
-*[Incluya aquí una explicación de la solución utilizada para implementar la API del proyecto. No olvide incluir las ligas o referencias donde se puede encontrar información de los lenguajes de programación, frameworks y librerías utilizadas.]*
+Nuestra API nos permite comunicacion entre los sensores y nuestra BD. Por este medio, los sensores envian informacion a diferentes endpoints, para que la informacion sea procesada y guardada, para despues ser visualizada.
 
 #### 3.5.1 Lenguaje de programación
+Se utilizo [Python 3.4](https://www.python.org/downloads/release/python-340/).
+
 #### 3.5.2 Framework
+El Framework utilzado fue [Flask](http://flask.pocoo.org/). Este framework nos permitio desarrollar el API de manera rapida, simple y ligera.
+
 #### 3.5.3 Librerías de funciones o dependencias
 
-*[Incluya aquí una explicación de cada uno de los endpoints que forman parte de la API. Cada endpoint debe estar correctamente documentado.]*
+Para poder comunicarse con Neo4j, se utilizo la libreria de [py2neo v4](https://py2neo.org/v4/). Esta libreria permite todas las operaciones sobre una BD en Neo4j.
 
-*[Por cada endpoint debe incluir lo siguiente:]*
+#### 3.5.4 Endpoints
 
-* **Descripción**:
-* **URL**:
-* **Verbos HTTP**:
-* **Headers**:
-* **Formato JSON del cuerpo de la solicitud**:
-* **Formato JSON de la respuesta**:
-
+A continuacion se presenta una lista con cada uno de los endpoints e informacion sobre ellos:
+1. Person
+  * **Descripción**: Manipulacion informacion sobre personas.
+  * **URL**: `/person`
+  * **Verbos HTTP**:
+    * `POST`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"edad:INT", "name:TEXT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT"}`
+    * `GET`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: NA
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "count:INT"}`
+2. Relation
+  * **Descripción**: Manipulacion de informacion sobre relaciones.
+  * **URL**: `/relation`
+  * **Verbos HTTP**:
+    * `POST`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"relation:TEXT", "first_id:INT", "second_id:INT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT"}`
+3. Disease
+  * **Descripción**: Manipulacion sobre informacion de enfermedades
+  * **URL**:`/disease`
+  * **Verbos HTTP**:
+    * `POST`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"name:TEXT", "spread_type:TEXT", "infected_id:INT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT", "id:INT"}`
+    * `GET`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: NA
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "count:INT"}`
+4. Spread
+  * **Descripción**: Propagacion de enfermedades
+  * **URL**:`/spread`
+  * **Verbos HTTP**:
+    * `POST`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"id:INT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT"}`
+5. Cure
+  * **Descripción**: Curar a una persona de una enfermedad.
+  * **URL**: `/cure`
+  * **Verbos HTTP**:
+    * `POST`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"id:INT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT"}`
+    * `GET`
+      * **Headers**: NA
+      * **Formato JSON del cuerpo de la solicitud**: `{"id:INT"}`
+      * **Formato JSON de la respuesta**: `{"message:TEXT", "count:INT"}`
 
 ## 3.6 Pasos a seguir para utilizar el proyecto
 
-      1. Ejecutar el contenedor donde se encuentra neo4j:
-        * sudo docker run --publish=7474:7474 --name=neo4j --publish=7687:7687 --volume=$HOME/neo4j/data:/data --env=NEO4J_AUTH=none --network=neo4j-net neo4j
-      2. Ejecutar el contenedor donde se encuentra el Api
-        * sudo docker build -t device-api .
-        * sudo docker run --network=neo4j-net -p 80:80 device-api
+1. Crear un proyecto nuevo en GCP.
 
+2. Clonar el repostorio:
 
-*[Incluya aquí una guía paso a paso para poder utilizar el proyecto, desde la clonación del repositorio hasta el despliegue de la solución en una plataforma en la nube.]*
+  `git clone https://github.com/tec-csf/TC3041-PF-Primavera-2019-equipo-9.git`
+
+3. Hacer el build de los contenedores de Neo4j y API:
+
+  `docker build -t gcr.io/<nombre_del_proyecto>/neo4j backend/neo4j .`
+
+  `docker build -t gcr.io/<nombre_del_proyecto>/api api/.`
+
+4. Hacer login a GCP desde la terminal con el comando:
+
+  `gcloud auth login`
+
+5. Hacer push de los contenedores a Cloud:
+
+  `docker push gcr.io/<nombre_del_proyecto/neo4j`
+  `docker push gcr.io/<nombre_del_proyecto/api`
+
+6. Crear un cluster de 6 nodos en Kubernetes en Google Cloud
+
+7. Conectarse al cluster desde la terminal, ejecutando el comando que aparece en `Connect` dentro de la pagina de Google Cloud.
+
+8. Ejecutar estos dos comandos para crear los primeros contenedores y reservar volumenes para elasticsearch.
+
+  `kubectl apply -f kubernetes/1_k8s-global`
+
+  `kubectl apply -f kubernetes/2_elasticsearch`
+
+9. Una vez que se levanten esos contenedores, ejecutar los siguientes comandos para terminar de desplegar la solucion.
+
+  `kubectl apply -f kubernetes/3_kibana`
+
+  `kubectl apply -f kubernetes/4_api-neo4j`
+
+10. Despues de unos minutos, debe ser posible conectarse al endpoint de Kibana.
+
+11. Si se quiere insertar datos, puede correr cualquiera de los archivos en `/sensors`, modificando la IP address por la IP de la API en Google Cloud.
 
 ## 4. Referencias
 
-*[Incluya aquí las referencias a sitios de interés, datasets y cualquier otra información que haya utilizado para realizar el proyecto y que le puedan ser de utilidad a otras personas que quieran usarlo como referencia]*
+* https://github.com/vcubells/kubernetes-examples
+* https://swagger.io/
+* https://py2neo.org/v4/
+* https://github.com/neo4j-contrib/neo4j-elasticsearch
+* https://engineering.udacity.com/high-performance-elk-with-kubernetes-part-1-1d09f41a4ce2
+* http://flask.pocoo.org/
