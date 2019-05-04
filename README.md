@@ -74,26 +74,26 @@ A continuación aparecen descritos los diferentes elementos que forman parte de 
 
 ### 3.1 Modelos de *bases de datos* utilizados
 
-Nuestro objetivo, al modelar este problema, era poder realizar un analisis de
-diferentes enfermedades sobre una poblacion determinada. Entonces necesitamos, primero crear una poblacion.
+Nuestro objetivo, al modelar este problema, era poder realizar un análisis de
+diferentes enfermedades sobre una población determinada. Entonces necesitamos primero crear una población.
 
-Las personas estan descritas por:
+Las personas están descritas por:
 1. ID: Inicia en 0, incremental.
 2. Nombre: Nombre aleatorio.
 3. Edad: Entre 0 y 100 años.
 
-Despues, para poder simular la propagacion de la enfermedad, era necesario formar relaciones entre las personas en nuestra poblacion. Las relaciones podian ser de tres tipos:
+Después, para poder simular la propagación de la enfermedad, era necesario formar relaciones entre las personas en nuestra población. Las relaciones podían ser de tres tipos:
 1. Familia
 2. Vecino
 3. Compañero de Trabajo
 
-Una vez que tenemos la poblacion descrita de esta manera, se pueden definir enfermedades:
+Una vez que tenemos la población descrita de esta manera, se pueden definir enfermedades:
 1. Nombre
-2. Tipo de propagacion:
+2. Tipo de propagación:
   * Aire
   * Fluidos
   * Tacto
-3. Numero de infectados
+3. Número de infectados
 
 ### 3.2 Arquitectura de la solución
 
@@ -101,7 +101,7 @@ Una vez que tenemos la poblacion descrita de esta manera, se pueden definir enfe
 
 ### 3.3 Frontend
 
-Para el frontend utilizamos [Kibana](https://www.elastic.co/products/kibana). Esta herramienta nos permite visualizar de manera interactiva el comportamiento de nuestras enfermedades. De igual manera, al estar sobre elasticsearch, permite visualizar cambios en propagacion a tiempo real.
+Para el frontend utilizamos [Kibana](https://www.elastic.co/products/kibana). Esta herramienta nos permite visualizar de manera interactiva el comportamiento de nuestras enfermedades. De igual manera, al estar sobre elasticsearch, permite visualizar cambios en propagación a tiempo real.
 
 De esta manera, fue simple crear nuestras diferentes visualizaciones dentro de la herramienta.
 
@@ -112,39 +112,39 @@ El Backend del proyecto fue dividido en dos diferentes Bases de Datos:
 2. Elasticsearch
 
 #### Neo4j
-Neo4j nos permite guardar las relaciones entre personas de manera eficiente. Ademas, nos ayudo a simular la propagacion de las enfermedades, ya que podemos encontrar cuales son las personas que estan infectadas con cierta enfermedad y buscar las conexiones entre ellas en tiempo constante.
+Neo4j nos permite guardar las relaciones entre personas de manera eficiente. Además, nos ayudó a simular la propagación de las enfermedades, ya que podemos encontrar cuales son las personas que estan infectadas con cierta enfermedad y buscar las conexiones entre ellas en tiempo constante.
 
 #### Elasticsearch
-Elasticsearch nos permite, en conjunto con Kibana, visualizar los datos sobre las diferentes enfermedades. Esta BD se alimenta de datos insertados en Neo4j. Despues de recuperar estos datos, los indexa de cierta manera para que Kibana pueda visualizarlos correctamente.
+Elasticsearch nos permite, en conjunto con Kibana, visualizar los datos sobre las diferentes enfermedades. Esta BD se alimenta de datos insertados en Neo4j. Después de recuperar estos datos, los indexa de cierta manera para que Kibana pueda visualizarlos correctamente.
 
 #### 3.4.1 Lenguaje de programación
-Neo4j configuration para la comunicacion entre Neo4j y elasticsearch.
+Neo4j configuration para la comunicación entre Neo4j y elasticsearch.
 #### 3.4.2 Framework
 1. Neo4j
 2. Elasticsearch
 
 #### 3.4.3 Librerías de funciones o dependencias
-Para la comunicacion entre Neo4j y elasticsearch se utilizo [este plugin](https://github.com/neo4j-contrib/neo4j-elasticsearch). Con este plugin, los datos insertados en Neo4j son copiados a tiempo real en nuestra BD de elasticsearch.
+Para la comunicación entre Neo4j y elasticsearch se utilizó [este plugin](https://github.com/neo4j-contrib/neo4j-elasticsearch). Con este plugin, los datos insertados en Neo4j son copiados a tiempo real en nuestra BD de elasticsearch.
 
 ### 3.5 API
 
-Nuestra API nos permite comunicacion entre los sensores y nuestra BD. Por este medio, los sensores envian informacion a diferentes endpoints, para que la informacion sea procesada y guardada, para despues ser visualizada.
+Nuestra API nos permite comunicación entre los sensores y nuestra BD. Por este medio, los sensores envían información a diferentes endpoints, para que la información sea procesada y guardada, para después ser visualizada.
 
 #### 3.5.1 Lenguaje de programación
-Se utilizo [Python 3.4](https://www.python.org/downloads/release/python-340/).
+Se utilizó [Python 3.4](https://www.python.org/downloads/release/python-340/).
 
 #### 3.5.2 Framework
-El Framework utilzado fue [Flask](http://flask.pocoo.org/). Este framework nos permitio desarrollar el API de manera rapida, simple y ligera.
+El Framework utilzado fue [Flask](http://flask.pocoo.org/). Este framework nos permitió desarrollar el API de manera rápida, simple y ligera.
 
 #### 3.5.3 Librerías de funciones o dependencias
 
-Para poder comunicarse con Neo4j, se utilizo la libreria de [py2neo v4](https://py2neo.org/v4/). Esta libreria permite todas las operaciones sobre una BD en Neo4j.
+Para poder comunicarse con Neo4j, se utilizó la librería de [py2neo v4](https://py2neo.org/v4/). Esta librería permite todas las operaciones sobre una BD en Neo4j.
 
 #### 3.5.4 Endpoints
 
-A continuacion se presenta una lista con cada uno de los endpoints e informacion sobre ellos:
+A continuación se presenta una lista con cada uno de los endpoints e información sobre ellos:
 1. Person
-  * **Descripción**: Manipulacion informacion sobre personas.
+  * **Descripción**: Manipulacion información sobre personas.
   * **URL**: `/person`
   * **Verbos HTTP**:
     * `POST`
@@ -156,7 +156,7 @@ A continuacion se presenta una lista con cada uno de los endpoints e informacion
       * **Formato JSON del cuerpo de la solicitud**: NA
       * **Formato JSON de la respuesta**: `{"message:TEXT", "count:INT"}`
 2. Relation
-  * **Descripción**: Manipulacion de informacion sobre relaciones.
+  * **Descripción**: Manipulación de información sobre relaciones.
   * **URL**: `/relation`
   * **Verbos HTTP**:
     * `POST`
@@ -164,7 +164,7 @@ A continuacion se presenta una lista con cada uno de los endpoints e informacion
       * **Formato JSON del cuerpo de la solicitud**: `{"relation:TEXT", "first_id:INT", "second_id:INT"}`
       * **Formato JSON de la respuesta**: `{"message:TEXT", "data:TEXT"}`
 3. Disease
-  * **Descripción**: Manipulacion sobre informacion de enfermedades
+  * **Descripción**: Manipulación sobre información de enfermedades
   * **URL**:`/disease`
   * **Verbos HTTP**:
     * `POST`
@@ -176,7 +176,7 @@ A continuacion se presenta una lista con cada uno de los endpoints e informacion
       * **Formato JSON del cuerpo de la solicitud**: NA
       * **Formato JSON de la respuesta**: `{"message:TEXT", "count:INT"}`
 4. Spread
-  * **Descripción**: Propagacion de enfermedades
+  * **Descripción**: Propagación de enfermedades
   * **URL**:`/spread`
   * **Verbos HTTP**:
     * `POST`
@@ -219,23 +219,23 @@ A continuacion se presenta una lista con cada uno de los endpoints e informacion
   `docker push gcr.io/<nombre_del_proyecto/neo4j`
   `docker push gcr.io/<nombre_del_proyecto/api`
 
-6. Crear un cluster de 6 nodos en Kubernetes en Google Cloud
+6. Crear un cluster de 6 nodos en Kubernetes en Google Cloud.
 
-7. Conectarse al cluster desde la terminal, ejecutando el comando que aparece en `Connect` dentro de la pagina de Google Cloud.
+7. Conectarse al cluster desde la terminal, ejecutando el comando que aparece en `Connect` dentro de la página de Google Cloud.
 
-8. Ejecutar estos dos comandos para crear los primeros contenedores y reservar volumenes para elasticsearch.
+8. Ejecutar estos dos comandos para crear los primeros contenedores y reservar volúmenes para elasticsearch.
 
   `kubectl apply -f kubernetes/1_k8s-global`
 
   `kubectl apply -f kubernetes/2_elasticsearch`
 
-9. Una vez que se levanten esos contenedores, ejecutar los siguientes comandos para terminar de desplegar la solucion.
+9. Una vez que se levanten esos contenedores, ejecutar los siguientes comandos para terminar de desplegar la solución.
 
   `kubectl apply -f kubernetes/3_kibana`
 
   `kubectl apply -f kubernetes/4_api-neo4j`
 
-10. Despues de unos minutos, debe ser posible conectarse al endpoint de Kibana.
+10. Después de unos minutos, debe ser posible conectarse al endpoint de Kibana.
 
 11. Si se quiere insertar datos, puede correr cualquiera de los archivos en `/sensors`, modificando la IP address por la IP de la API en Google Cloud.
 
