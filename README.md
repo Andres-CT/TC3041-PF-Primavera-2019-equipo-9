@@ -103,7 +103,7 @@ Una vez que tenemos la población descrita de esta manera, se pueden definir enf
 
 Para el frontend utilizamos [Kibana](https://www.elastic.co/products/kibana). Esta herramienta nos permite visualizar de manera interactiva el comportamiento de nuestras enfermedades. De igual manera, al estar sobre elasticsearch, permite visualizar cambios en propagación a tiempo real.
 
-De esta manera, fue simple crear nuestras diferentes visualizaciones dentro de la herramienta.
+Así, fue simple crear nuestras diferentes visualizaciones dentro de la herramienta.
 
 ### 3.4 Backend
 
